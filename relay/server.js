@@ -2,6 +2,19 @@ const express = require('express');
 const axios = require('axios');
 require('dotenv').config();
 
+/**
+ * FireWally relay
+ * ---------------
+ * POC: local Node process; S2S OAuth secrets from .env
+ *
+ * Production (planned):
+ * - Deploy on internal PCP
+ * - Load OAUTH_* / GoCaaS config from AWS Secrets Manager
+ * - Require analyst JWT (Authorization: Bearer <jwt>) on /api/v1/relay/*
+ * Set AUTH_MODE=jwt when that path is implemented.
+ */
+const AUTH_MODE = String(process.env.AUTH_MODE || 'poc').toLowerCase();
+
 const app = express();
 app.use(express.json({ limit: '2mb' }));
 
@@ -16,6 +29,28 @@ app.use((req, res, next) => {
   if (req.method === 'OPTIONS') return res.sendStatus(200);
   next();
 });
+
+/**
+ * Placeholder JWT gate for production.
+ * POC skips validation. When AUTH_MODE=jwt, reject until real JWKS verification is wired.
+ */
+function requireCallerAuth(req, res, next) {
+  if (AUTH_MODE !== 'jwt') return next();
+  const header = String(req.headers.authorization || '');
+  const token = header.startsWith('Bearer ') ? header.slice(7).trim() : '';
+  if (!token) {
+    return res.status(401).json({
+      error: 'Unauthorized',
+      details: 'Missing Bearer JWT (production AUTH_MODE=jwt).',
+    });
+  }
+  // TODO(prod): verify JWT via JWKS (JWT_JWKS_URL / issuer / audience).
+  // TODO(prod): load S2S secrets from AWS Secrets Manager (AWS_SECRETS_MANAGER_SECRET_ID).
+  return res.status(501).json({
+    error: 'Not implemented',
+    details: 'JWT verification + Secrets Manager not wired yet. Use AUTH_MODE=poc for local POC.',
+  });
+}
 
 // POC: companion IDs are remapped to Claude + a system prompt (S2S cannot run Open WebUI companions as-is).
 const WSS_PROMPTS = {
@@ -98,10 +133,14 @@ function resolveModelAndMessages(requestedModel, messages) {
 }
 
 app.get('/health', (req, res) => {
-  res.json({ status: 'ok', service: 'gravity-tools-relay' });
+  res.json({
+    status: 'ok',
+    service: 'gravity-tools-relay',
+    authMode: AUTH_MODE,
+  });
 });
 
-app.post('/api/v1/relay/chat', async (req, res) => {
+app.post('/api/v1/relay/chat', requireCallerAuth, async (req, res) => {
   try {
     const token = await getS2SToken();
     const { model: requestedModel = DEFAULT_MODEL, messages = [], stream = false } = req.body || {};
@@ -145,5 +184,6 @@ app.post('/api/v1/relay/chat', async (req, res) => {
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
   console.log(`Gravity Tools Relay running on http://localhost:${PORT}`);
+  console.log(`Auth mode: ${AUTH_MODE} (poc = local .env S2S; jwt = PCP + Secrets Manager — not implemented)`);
   console.log(`GoCaaS timeout: ${GOCAAS_TIMEOUT_MS}ms — companion IDs remap to ${DEFAULT_MODEL}`);
 });

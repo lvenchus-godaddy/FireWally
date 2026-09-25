@@ -102,10 +102,30 @@ FireWally/
 
 ---
 
+## Production roadmap (not this POC)
+
+This repo is a **local proof of concept**. The intended production shape:
+
+| POC (now) | Production |
+|-----------|------------|
+| `relay/` on `localhost:8080` | Relay service on an internal **PCP** host |
+| OAuth client id/secret in local `.env` | Credentials in **AWS Secrets Manager** |
+| No caller auth (laptop → local relay) | Analyst **JWT** on each request (`Authorization: Bearer …`) |
+| Extension default → `http://localhost:8080` | Extension → PCP base URL (Settings override already supported) |
+
+**Extension changes (later):** send JWT on chat/health calls; point default backend at PCP; add PCP host to extension permissions.
+
+**Relay changes (later):** validate JWT; load GoCaaS/S2S secrets from Secrets Manager; deploy on PCP (this `relay/server.js` is the starting point).
+
+Placeholders for that work live in `relay/server.js`, `relay/.env.example`, and comments in `chrome-extension/content.js`.
+
+---
+
 ## Security
 
 - Commit `.env.example` only. Keep real `.env` on your machine.
 - Internal tooling — not for Chrome Web Store / public secret sharing.
+- Production must not ship long-lived secrets in the browser or in this repo.
 
 ---
 

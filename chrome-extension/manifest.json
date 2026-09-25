@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "FireWally",
   "version": "1.3.2",
-  "description": "FireWally companions via local Gravity Tools relay (localhost:8080 → GoCaaS S2S).",
+  "description": "FireWally companions via Gravity Tools relay (POC: localhost → GoCaaS; prod: PCP + JWT).",
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",

@@ -110,10 +110,18 @@
   const STORE_BACKEND_OK = 'fw_backend_ok';
   const DEFAULT_USAGE_WEBHOOK = 'https://defaultd5f1622b14a345a6b069003f8dc485.1f.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/0eb3e3e3e76e4587b9109ddba44f1ecf/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=nF_7fwTax8gT9uu5yUvZBuY3UfcBHQ3uNjvyAPDDAXg';
 
-  /* Local Node relay POC (S2S OAuth to GoCaaS lives on the server). */
+  /* Local Node relay POC (S2S OAuth to GoCaaS lives on the server).
+   *
+   * Production (planned):
+   * - RELAY_BASE_URL → internal PCP relay host (override still works via Settings)
+   * - Attach analyst JWT: Authorization: Bearer <token> on chat/health
+   * - Server loads secrets from AWS Secrets Manager (not the browser)
+   * See README "Production roadmap".
+   */
   const RELAY_BASE_URL = 'http://localhost:8080';
   const RELAY_API_URL = 'http://localhost:8080/api/v1/relay/chat';
   const RELAY_HEALTH_URL = 'http://localhost:8080/health';
+  // const STORE_JOMAX_JWT = 'fw_jomax_jwt'; // TODO(prod): persist/paste analyst JWT for PCP relay
 
   const CONFIG = {
     BACKEND_BASE_URL: RELAY_BASE_URL,
@@ -572,6 +580,7 @@
       Accept: options.accept || 'application/json',
       ...(options.headers || {}),
     };
+    // TODO(prod): if JWT present, set headers.Authorization = `Bearer ${jwt}`
     if (options.body != null && !headers['Content-Type']) {
       headers['Content-Type'] = 'application/json';
     }
