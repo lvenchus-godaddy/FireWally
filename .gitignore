@@ -2,5 +2,5 @@
 **/.DS_Store
 *.numbers
 .env
-.env.*
+!.env.example
 node_modules/
