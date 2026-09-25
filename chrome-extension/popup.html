@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <style>
+    :root {
+      --bg: #1a1410;
+      --fg: #f5f0ea;
+      --muted: #b8a99a;
+      --accent: #e85d2a;
+      --ok: #22c55e;
+      --off: #78716c;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      width: 280px;
+      font: 13px/1.45 "Segoe UI", system-ui, sans-serif;
+      color: var(--fg);
+      background: linear-gradient(165deg, #2a1f18 0%, var(--bg) 55%);
+    }
+    .wrap { padding: 14px 14px 12px; }
+    .row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    img.icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+    }
+    h1 {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 650;
+      letter-spacing: 0.01em;
+    }
+    .status {
+      margin-top: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.06);
+    }
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--off);
+      flex-shrink: 0;
+    }
+    .dot.on { background: var(--ok); box-shadow: 0 0 0 3px rgba(34,197,94,0.25); }
+    .label { font-weight: 600; }
+    .hint {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .hint strong { color: var(--fg); font-weight: 600; }
+    .pin {
+      margin-top: 10px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      background: rgba(232,93,42,0.12);
+      border: 1px solid rgba(232,93,42,0.35);
+      color: #f0c9b8;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="row">
+      <img class="icon" src="icons/icon48.png" alt="" />
+      <div>
+        <h1>FireWally</h1>
+        <div style="color:var(--muted);font-size:11px">Local relay companions</div>
+      </div>
+    </div>
+    <div class="status">
+      <span class="dot" id="dot"></span>
+      <span class="label" id="label">Checking…</span>
+    </div>
+    <p class="hint" id="hint"></p>
+    <div class="pin">
+      To keep the icon in the top-right toolbar: open the <strong>puzzle piece</strong> → find <strong>FireWally</strong> → click the <strong>pin</strong>.
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
